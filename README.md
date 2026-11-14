@@ -1,5 +1,7 @@
 # AI Trend Video Toolkit
 
+English | [中文](README.zh-CN.md)
+
 Tools for remaking viral TikTok, YouTube Shorts and Instagram Reels trends: a clip-prep script, an AI-agent skill, and an honest list of the apps that put your face into trend videos.
 
 > Made by the team behind [TrendTemplate](https://trendtemplate.com), one of the apps in the list below. The script and the skill work on their own; you don't need our site to use them.
