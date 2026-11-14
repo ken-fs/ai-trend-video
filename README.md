@@ -6,7 +6,7 @@ Tools for remaking viral TikTok, YouTube Shorts and Instagram Reels trends: a cl
 
 > Made by the team behind [TrendTemplate](https://trendtemplate.com), one of the apps in the list below. The script and the skill work on their own; you don't need our site to use them.
 
-- **[`trendclip.py`](trendclip.py)**: paste a TikTok / Shorts / Reels link, get the original clip cropped to 9:16 or 16:9, the original sound as MP3, every camera cut with its time, and a contact sheet.
+- **[`trendclip.py`](trendclip.py)**: paste a TikTok / Shorts / Reels link, get the original clip cropped to 9:16 or 16:9, the original sound as MP3, every camera cut with its time, and a contact sheet. Also: one still per shot, a "trend vs me" side-by-side video, and a check of whether two videos share the same sound.
 - **[`skills/trend-video`](skills/trend-video/SKILL.md)**: a skill for Claude Code, Codex and other coding agents. Ask "help me make the Wassup In A Minute video" and the agent finds the original, runs `trendclip`, names the song and picks the quickest way to make your version.
 - **[AI trend video apps compared](#ai-apps-that-put-your-face-in-a-trend-video)** and a **[trend index](#trend-index)** with the song and origin of current trends.
 
@@ -45,11 +45,33 @@ Options:
 - `--threshold 0.25` is how big a change counts as a cut. Lower it (0.15) if a cut between two similar-looking shots is missed.
 - `python3 trendclip.py cuts my_clip.mp4` prints the shot list of a file you already have.
 
+### More commands
+
+```bash
+python3 trendclip.py frames wassup/clip.mp4 --out frames                 # one still per shot (storyboard, thumbnails, first frames)
+python3 trendclip.py compare wassup/clip.mp4 my_version.mp4 --labels "Original,Me"   # "trend vs me", side by side
+python3 trendclip.py compare wassup/clip.mp4 my_version.mp4 --layout stack           # one above the other
+python3 trendclip.py match original.mp4 repost.mp4                       # same sound? where does one start in the other?
+```
+
+`match` compares the rhythm of the two sound tracks (bass, mids and highs separately), so it still works when a repost is re-encoded, quieter, or a few seconds shorter. Use it to find which post is the real original (reposts and AI remakes often have new footage over the old sound), or to find where a trend clip starts inside the full song. In our tests the same sound scored 0.82–1.00 and different dance tracks scored at most 0.41:
+
+```
+same sound: score 1.00; hey-boo-15s.mp3 starts 11.88 s into hey-boo-full.mp3
+different sound: score 0.41
+```
+
+`compare --labels` needs an ffmpeg built with the `drawtext` filter; without it you get the same video without labels.
+
 **Links that work:** TikTok, YouTube Shorts, Instagram Reels, Facebook, X, and most of the [sites yt-dlp supports](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md). Local files work too. We tested TikTok, Shorts and Reels on 14 November 2026.
 
 **If it asks you to log in:** some TikTok posts and most YouTube videos from a busy network need a logged-in browser. Add `--cookies-from-browser chrome` (or `firefox`, `safari`, `edge`). If YouTube keeps saying "Sign in to confirm you're not a bot", [export a cookies.txt](https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies) and pass `--cookies cookies.txt`.
 
 Only download clips you're allowed to use, and credit the creator when you post.
+
+## What this toolkit doesn't do
+
+It doesn't swap faces or generate video. It gets the original ready and tells you how the trend is built; making your version is up to you. To put your face (or your pet's) into the original clip without filming, use one of the [apps below](#ai-apps-that-put-your-face-in-a-trend-video).
 
 ## The trend-video skill
 
@@ -61,7 +83,7 @@ mkdir -p ~/.claude/skills && cp -r skills/trend-video ~/.claude/skills/
 # Codex / other agents that read skills: copy skills/trend-video wherever they load skills from
 ```
 
-Then ask things like "make the Wassup In A Minute video with my friends", "what song is the Hotline Bling dance trend", or paste a link and say "I want to do this one". The skill tells the agent to find the real original (not a repost), get the song right (trend names are often misheard lyrics), run `trendclip`, and then suggest filming it, editing it in CapCut, or an AI face swap.
+Then ask things like "make the Wassup In A Minute video with my friend", "what song is the Hotline Bling dance trend", or paste a link and say "I want to do this one". The skill tells the agent to find the real original (not a repost), get the song right (trend names are often misheard lyrics), run `trendclip`, then suggest filming it, editing it in CapCut, or an AI face swap, and go through a short checklist before posting (format, caption, credits, AI label).
 
 ## AI apps that put your face in a trend video
 

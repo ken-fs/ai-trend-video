@@ -6,7 +6,7 @@
 
 > 由 [TrendTemplate](https://trendtemplate.com) 团队制作，下面对比表里也有我们自己的产品。脚本和 skill 不依赖我们的网站，单独就能用。
 
-- **[`trendclip.py`](trendclip.py)**：贴一个 TikTok / Shorts / Reels 链接，拿到裁成 9:16 或 16:9 的原片、原声 MP3、每个镜头的切换时间，还有一张逐镜头预览图。
+- **[`trendclip.py`](trendclip.py)**：贴一个 TikTok / Shorts / Reels 链接，拿到裁成 9:16 或 16:9 的原片、原声 MP3、每个镜头的切换时间，还有一张逐镜头预览图。另外还能每个镜头存一张图、做「原版 vs 我」的并排视频、判断两条视频是不是同一段声音。
 - **[`skills/trend-video`](skills/trend-video/SKILL.md)**：给 Claude Code、Codex 等 AI 编程助手用的 skill。跟它说「帮我做 Wassup In A Minute 的视频」，它会去找原片、跑 `trendclip`、告诉你是什么歌，再给出最省事的做法。
 - 下面还有 **[AI 热梗视频工具对比](#把你的脸放进热梗视频的-ai-工具)** 和 **[热梗索引](#热梗索引)**（当前热梗的歌名和来历）。
 
@@ -45,11 +45,33 @@ wrote wassup/SHOTS.md and shots.json
 - `--threshold 0.25`：画面变化多大算一次切换。两个镜头长得很像、没被认出来时调低到 0.15。
 - `python3 trendclip.py cuts my_clip.mp4`：只看手上已有视频的镜头表。
 
+### 其它命令
+
+```bash
+python3 trendclip.py frames wassup/clip.mp4 --out frames                 # 每个镜头存一张图（分镜、封面、首帧）
+python3 trendclip.py compare wassup/clip.mp4 my_version.mp4 --labels "Original,Me"   # 「原版 vs 我」左右并排
+python3 trendclip.py compare wassup/clip.mp4 my_version.mp4 --layout stack           # 上下叠放
+python3 trendclip.py match original.mp4 repost.mp4                       # 是不是同一段声音？一条从另一条的第几秒开始？
+```
+
+`match` 比的是两段声音的节奏（低音、中音、高音分开比），所以转发被重新压缩、音量变小、或者短了几秒也能认出来。可以用来找哪条才是真正的原片（转发和 AI 重做常常是新画面配旧声音），或者找一段热梗从完整歌曲的第几秒开始。我们测试时，同一段声音得分 0.82–1.00，不同的舞曲最高 0.41：
+
+```
+same sound: score 1.00; hey-boo-15s.mp3 starts 11.88 s into hey-boo-full.mp3
+different sound: score 0.41
+```
+
+`compare --labels` 需要 ffmpeg 带 `drawtext` 功能；没有的话会照样出片，只是不带文字标签。
+
 **支持哪些链接**：TikTok、YouTube Shorts、Instagram Reels、Facebook、X，以及 [yt-dlp 支持的](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)大多数网站，本地视频文件也行。TikTok、Shorts、Reels 我们 2026 年 11 月 14 日都实测过。
 
 **要求登录时**：有些 TikTok 帖子、以及很多 YouTube 视频（网络繁忙时）要已登录的浏览器才能下。加上 `--cookies-from-browser chrome`（也可以是 `firefox`、`safari`、`edge`）。YouTube 一直提示「Sign in to confirm you're not a bot」的话，[导出 cookies.txt](https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies)，再加 `--cookies cookies.txt`。
 
 只下载你有权使用的视频，发布时注明原作者。
+
+## 这个工具包不做什么
+
+它不换脸，也不生成视频。它只负责把原片准备好、告诉你这个梗是怎么拍的，你的版本怎么做由你决定。想不拍视频、直接把你（或你家宠物）的脸换进原片，用[下面这些 App](#把你的脸放进热梗视频的-ai-工具)。
 
 ## trend-video skill
 
@@ -61,7 +83,7 @@ mkdir -p ~/.claude/skills && cp -r skills/trend-video ~/.claude/skills/
 # Codex 或其它支持 skill 的助手：把 skills/trend-video 放到它加载 skill 的位置
 ```
 
-然后就可以这样问：「帮我和朋友做 Wassup In A Minute 的视频」「Hotline Bling 那个舞是什么歌」，或者直接贴一个链接说「我想做这个」。skill 里写的是 AI 该怎么做：先找到真正的原片（不是转发），把歌名说对（梗名经常是把歌词听错了），跑 `trendclip`，再根据你要的给出做法：自己拍、用 CapCut 剪，或者用 AI 换脸。skill 本身是英文写的，你用中文问，助手照样用中文回答。
+然后就可以这样问：「帮我和朋友做 Wassup In A Minute 的视频」「Hotline Bling 那个舞是什么歌」，或者直接贴一个链接说「我想做这个」。skill 里写的是 AI 该怎么做：先找到真正的原片（不是转发），把歌名说对（梗名经常是把歌词听错了），跑 `trendclip`，再根据你要的给出做法：自己拍、用 CapCut 剪，或者用 AI 换脸，发布前再过一遍清单（比例、标题、注明原作者、AI 标注）。skill 本身是英文写的，你用中文问，助手照样用中文回答。
 
 ## 把你的脸放进热梗视频的 AI 工具
 

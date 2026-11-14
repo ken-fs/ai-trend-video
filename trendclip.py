@@ -14,6 +14,9 @@ Needs ffmpeg / ffprobe on PATH, and yt-dlp if you pass a URL. Python standard li
   python3 trendclip.py prep "https://www.tiktok.com/@user/video/123" --ratio 16:9 --short 7
   python3 trendclip.py prep my_clip.mp4 --ratio 9:16 --out wassup
   python3 trendclip.py cuts my_clip.mp4            # only print the cut times
+  python3 trendclip.py frames my_clip.mp4          # one still per shot
+  python3 trendclip.py compare original.mp4 mine.mp4 --labels "Original,Me"   # "trend vs me" video
+  python3 trendclip.py match original.mp4 repost.mp4                          # same sound? at what offset?
 
 Made by the TrendTemplate team (https://trendtemplate.com). MIT license.
 """
@@ -200,6 +203,127 @@ def cmd_cuts(args: argparse.Namespace) -> None:
         print(f"shot {s['shot']}: {s['start']:>6} – {s['end']:>6} s  ({s['length']} s)")
 
 
+def has_filter(name: str) -> bool:
+    out = subprocess.run(["ffmpeg", "-hide_banner", "-filters"], text=True, capture_output=True).stdout
+    return any(line.split()[1:2] == [name] for line in out.splitlines() if len(line.split()) > 1)
+
+
+def label_filter(text: str) -> str:
+    safe = text.replace("\\", "").replace("'", "").replace(":", " ")
+    return (f"drawtext=text='{safe}':x=24:y=24:fontsize=h/22:fontcolor=white:"
+            "box=1:boxcolor=black@0.55:boxborderw=12")
+
+
+def cmd_compare(args: argparse.Namespace) -> None:
+    """Original and your version next to each other: the "trend vs me" post."""
+    need("ffmpeg"), need("ffprobe")
+    a, b = probe(args.original), probe(args.mine)
+    duration = min(a["duration"], b["duration"])
+    portrait = a["height"] > a["width"]
+    if args.layout == "side":  # same height, next to each other (two portrait clips → 1080x960-ish, two landscape → 1920x540)
+        size, stack = f"scale=-2:{960 if portrait else 540},setsar=1", "hstack=inputs=2"
+    else:  # same width, one above the other
+        size, stack = f"scale={540 if portrait else 960}:-2,setsar=1", "vstack=inputs=2"
+    labels = [x.strip() for x in args.labels.split(",")] if args.labels else []
+    use_labels = len(labels) == 2 and has_filter("drawtext")
+    if labels and not use_labels:
+        print("note: this ffmpeg has no drawtext filter, so the labels are left out")
+    la = f",{label_filter(labels[0])}" if use_labels else ""
+    lb = f",{label_filter(labels[1])}" if use_labels else ""
+    src = 0 if args.audio == "original" else 1
+    has_audio = (a if src == 0 else b)["has_audio"]
+
+    def render(la: str, lb: str) -> None:
+        graph = f"[0:v]{size}{la}[a];[1:v]{size}{lb}[b];[a][b]{stack}[v]"
+        run(["ffmpeg", "-v", "error", "-y", "-i", args.original, "-i", args.mine, "-filter_complex", graph,
+             "-map", "[v]"] + (["-map", f"{src}:a"] if has_audio else []) + [
+             "-t", f"{duration}", "-c:v", "libx264", "-crf", "20", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
+             "-movflags", "+faststart", args.out])
+
+    try:
+        render(la, lb)
+    except subprocess.CalledProcessError:
+        if not use_labels:
+            raise
+        print("note: drawing the labels failed (often a missing font), so they are left out")
+        render("", "")
+    print(f"wrote {args.out} ({args.layout}, {duration} s, sound from {args.audio})")
+
+
+def cmd_frames(args: argparse.Namespace) -> None:
+    """One still per shot, taken just after each cut (for image-to-video tools, thumbnails or a storyboard)."""
+    need("ffmpeg"), need("ffprobe")
+    info = probe(args.source)
+    os.makedirs(args.out, exist_ok=True)
+    shots = shot_list(find_cuts(args.source, args.threshold), info["duration"])
+    for s in shots:
+        t = s["start"] + min(0.2, s["length"] / 3)  # a moment after the cut, so it isn't a blend of two shots
+        dst = os.path.join(args.out, f"shot-{s['shot']:02d}.jpg")
+        run(["ffmpeg", "-v", "error", "-y", "-ss", f"{t:.2f}", "-i", args.source, "-frames:v", "1", "-q:v", "2", dst])
+        print(f"{dst}  shot {s['shot']} at {t:.2f} s ({s['start']}–{s['end']} s)")
+
+
+ENV_RATE = 50  # loudness samples per second for match (one every 20 ms)
+BANDS = ["lowpass=f=250", "bandpass=f=1200:width_type=o:w=2", "highpass=f=3500"]  # bass, mids (voice), highs (hats, claps)
+
+
+def onset_envelopes(path: str, max_seconds: float) -> list[list[float]]:
+    """For each band: how much louder each 20 ms gets than the one before. Robust to volume and voice-over level."""
+    import array
+    out = []
+    step = 8000 // ENV_RATE
+    for band in BANDS:
+        raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-t", f"{max_seconds}", "-vn", "-ac", "1", "-af", band,
+                              "-ar", "8000", "-f", "s16le", "-"], capture_output=True, check=True).stdout
+        pcm = array.array("h")
+        pcm.frombytes(raw[: len(raw) // 2 * 2])
+        energy = [math.log1p(sum(abs(v) for v in pcm[i:i + step]) / step) for i in range(0, len(pcm) - step + 1, step)]
+        out.append([max(0.0, e - p) for p, e in zip([energy[0]] + energy, energy)] if energy else [])
+    return out
+
+
+def pearson(xa: list[float], xb: list[float]) -> float | None:
+    n = len(xa)
+    ma, mb = sum(xa) / n, sum(xb) / n
+    va = sum((x - ma) ** 2 for x in xa)
+    vb = sum((y - mb) ** 2 for y in xb)
+    if va <= 0 or vb <= 0:
+        return None
+    return sum((x - ma) * (y - mb) for x, y in zip(xa, xb)) / math.sqrt(va * vb)
+
+
+def correlate(a: list[list[float]], b: list[list[float]], min_overlap: int) -> tuple[float, int]:
+    """Slide b against a; score = mean correlation over the bands. Returns (score, offset): b[0] lines up with a[offset]."""
+    la, lb = len(a[0]), len(b[0])
+    best = (-1.0, 0)
+    for off in range(-(lb - min_overlap), la - min_overlap + 1):
+        sa, sb = max(0, off), max(0, -off)
+        n = min(la - sa, lb - sb)
+        if n < min_overlap:
+            continue
+        rs = [pearson(ba[sa:sa + n], bb[sb:sb + n]) for ba, bb in zip(a, b)]
+        rs = [r for r in rs if r is not None]
+        if rs and sum(rs) / len(rs) > best[0]:
+            best = (sum(rs) / len(rs), off)
+    return best
+
+
+def cmd_match(args: argparse.Namespace) -> None:
+    """Do two videos use the same sound, and where does one start inside the other?"""
+    need("ffmpeg")
+    a = onset_envelopes(args.a, args.max_seconds)
+    b = onset_envelopes(args.b, args.max_seconds)
+    if not a[0] or not b[0]:
+        sys.exit("trendclip: one of the files has no sound")
+    score, off = correlate(a, b, min(len(a[0]), len(b[0]), ENV_RATE * 3))
+    sec = off / ENV_RATE
+    # 14 Nov 2026 tests: the same sound scored 0.82–1.00 (excerpts, re-encodes, a Reel repost); different dance tracks up to 0.41
+    verdict = "same sound" if score >= 0.65 else "maybe the same sound (check by ear)" if score >= 0.5 else "different sound"
+    na, nb = (args.a, args.b) if os.path.basename(args.a) == os.path.basename(args.b) else (os.path.basename(args.a), os.path.basename(args.b))
+    where = f"{nb} starts {sec:.2f} s into {na}" if sec >= 0 else f"{na} starts {-sec:.2f} s into {nb}"
+    print(f"{verdict}: score {score:.2f}" + (f"; {where}" if score >= 0.5 else ""))
+
+
 def main() -> None:
     p = argparse.ArgumentParser(prog="trendclip", description="Get a viral clip ready to remake: download, find cuts, crop, export sound.")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -218,6 +342,24 @@ def main() -> None:
     cuts.add_argument("source")
     cuts.add_argument("--threshold", type=float, default=0.25)
     cuts.set_defaults(func=cmd_cuts)
+    comp = sub.add_parser("compare", help='put the original and your version next to each other ("trend vs me")')
+    comp.add_argument("original")
+    comp.add_argument("mine")
+    comp.add_argument("--layout", choices=["side", "stack"], default="side", help="side by side (default) or one above the other")
+    comp.add_argument("--labels", help='two labels, e.g. "Original,Me" (needs an ffmpeg with drawtext)')
+    comp.add_argument("--audio", choices=["original", "mine"], default="original", help="whose sound to keep (default: original)")
+    comp.add_argument("--out", default="compare.mp4")
+    comp.set_defaults(func=cmd_compare)
+    fr = sub.add_parser("frames", help="save one still per shot")
+    fr.add_argument("source")
+    fr.add_argument("--out", default="frames")
+    fr.add_argument("--threshold", type=float, default=0.25)
+    fr.set_defaults(func=cmd_frames)
+    ma = sub.add_parser("match", help="check whether two videos use the same sound, and the offset between them")
+    ma.add_argument("a", help="usually the longer one (the full song, or the original post)")
+    ma.add_argument("b", help="the clip to look for in it (a repost, a remake, your edit)")
+    ma.add_argument("--max-seconds", type=float, default=120, help="only read this much of each file (default 120)")
+    ma.set_defaults(func=cmd_match)
     args = p.parse_args()
     args.func(args)
 
