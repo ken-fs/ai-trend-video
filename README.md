@@ -69,10 +69,6 @@ different sound: score 0.41
 
 Only download clips you're allowed to use, and credit the creator when you post.
 
-## What this toolkit doesn't do
-
-It doesn't swap faces or generate video. It gets the original ready and tells you how the trend is built; making your version is up to you. To put your face (or your pet's) into the original clip without filming, use one of the [apps below](#ai-apps-that-put-your-face-in-a-trend-video).
-
 ## The trend-video skill
 
 Copy the folder into your agent's skills folder:
