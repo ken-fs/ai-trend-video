@@ -1,0 +1,7 @@
+trendclip-out/
+*.mp4
+*.mp3
+*.jpg
+__pycache__/
+.DS_Store
+cookies.txt
