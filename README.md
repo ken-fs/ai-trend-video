@@ -103,6 +103,7 @@ Current trends on TrendTemplate, each with a page that answers the usual questio
 
 | Trend | Length | People | Guides |
 |---|---|---|---|
+| [Need for Speed AI](https://trendtemplate.com/need-for-speed-ai) | 7 s / 14 s | 1 car photo (cars, trucks, SUVs) | [The movie & the car](https://trendtemplate.com/need-for-speed-ai/movie) · [Origin & timeline](https://trendtemplate.com/need-for-speed-ai/trend) · [How to](https://trendtemplate.com/need-for-speed-ai/how-to) |
 | [Wassup In A Minute](https://trendtemplate.com/wassup-in-a-minute-ai) | 7 s / 15 s | 1–2 + pets | [Song](https://trendtemplate.com/wassup-in-a-minute-ai/song) · [Origin & timeline](https://trendtemplate.com/wassup-in-a-minute-ai/trend) · [How to](https://trendtemplate.com/wassup-in-a-minute-ai/how-to) |
 | [Waist Heart](https://trendtemplate.com/waist-heart-ai) | 9 s | 1 | [Origin & timeline](https://trendtemplate.com/waist-heart-ai/trend) · [How to](https://trendtemplate.com/waist-heart-ai/how-to) |
 | [Drake Hotline Bling Dance](https://trendtemplate.com/drake-hotline-bling-dance-ai) | 7 s / 14 s | 1 | [Song](https://trendtemplate.com/drake-hotline-bling-dance-ai/song) · [Origin & timeline](https://trendtemplate.com/drake-hotline-bling-dance-ai/trend) · [How to](https://trendtemplate.com/drake-hotline-bling-dance-ai/how-to) |
