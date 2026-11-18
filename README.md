@@ -103,6 +103,7 @@ Current trends on TrendTemplate, each with a page that answers the usual questio
 
 | Trend | Length | People | Guides |
 |---|---|---|---|
+| [Pterodactyl Juárez](https://trendtemplate.com/pterodactyl-juarez-ai) (Pterodáctilo de Juárez, "ya lo agarré") | 7 s / 10 s | 1 | [Is it real? Origin](https://trendtemplate.com/pterodactyl-juarez-ai/trend) · [What "ya lo agarré" means](https://trendtemplate.com/pterodactyl-juarez-ai/ya-lo-agarre) · [How to](https://trendtemplate.com/pterodactyl-juarez-ai/how-to) |
 | [Snowman Dance](https://trendtemplate.com/snowman-dance-ai) | 6 s / 12 s | 1–2 | [Song](https://trendtemplate.com/snowman-dance-ai/song) · [Dance tutorial](https://trendtemplate.com/snowman-dance-ai/tutorial) · [How to](https://trendtemplate.com/snowman-dance-ai/how-to) |
 | [Jingle Bell Brazil Dance](https://trendtemplate.com/jingle-bell-brazil-dance-ai) | 7 s / 15 s | 1–3 (one photo = you in all three spots) | [Song](https://trendtemplate.com/jingle-bell-brazil-dance-ai/song) · [Who started it](https://trendtemplate.com/jingle-bell-brazil-dance-ai/trend) · [How to](https://trendtemplate.com/jingle-bell-brazil-dance-ai/how-to) |
 | [Santa Hug](https://trendtemplate.com/santa-hug-ai) | 7 s / 12 s | 1 | [What it is](https://trendtemplate.com/santa-hug-ai/trend) · [How to](https://trendtemplate.com/santa-hug-ai/how-to) · [Christmas card ideas](https://trendtemplate.com/santa-hug-ai/christmas-card) |
