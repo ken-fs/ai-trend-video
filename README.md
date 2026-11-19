@@ -103,6 +103,7 @@ Current trends on TrendTemplate, each with a page that answers the usual questio
 
 | Trend | Length | People | Guides |
 |---|---|---|---|
+| [Christmas Photobooth](https://trendtemplate.com/christmas-photobooth-ai) (Christmas photo booth trend, "Last Christmas" photobooth) | 7 s / 15 s | 1–2 | [Song](https://trendtemplate.com/christmas-photobooth-ai/song) · [Who started it](https://trendtemplate.com/christmas-photobooth-ai/trend) · [How to](https://trendtemplate.com/christmas-photobooth-ai/how-to) |
 | [Pterodactyl Juárez](https://trendtemplate.com/pterodactyl-juarez-ai) (Pterodáctilo de Juárez, "ya lo agarré") | 7 s / 10 s | 1 | [Is it real? Origin](https://trendtemplate.com/pterodactyl-juarez-ai/trend) · [What "ya lo agarré" means](https://trendtemplate.com/pterodactyl-juarez-ai/ya-lo-agarre) · [How to](https://trendtemplate.com/pterodactyl-juarez-ai/how-to) |
 | [Santa Nice List](https://trendtemplate.com/santa-nice-list-ai) ("quién se portó bien este año") | 7 s / 12 s | 1 or a pet | [Origin & timeline](https://trendtemplate.com/santa-nice-list-ai/trend) · [How to](https://trendtemplate.com/santa-nice-list-ai/how-to) · [Pet version](https://trendtemplate.com/santa-nice-list-ai/pets) |
 | [Snowman Dance](https://trendtemplate.com/snowman-dance-ai) | 6 s / 12 s | 1–2 | [Song](https://trendtemplate.com/snowman-dance-ai/song) · [Dance tutorial](https://trendtemplate.com/snowman-dance-ai/tutorial) · [How to](https://trendtemplate.com/snowman-dance-ai/how-to) |
