@@ -103,6 +103,7 @@ Current trends on TrendTemplate, each with a page that answers the usual questio
 
 | Trend | Length | People | Guides |
 |---|---|---|---|
+| [Vlogmas Intro](https://trendtemplate.com/vlogmas-intro-ai) (cartoon Vlogmas intro, Welcome to Vlogmas intro, hand-drawn Vlogmas intro) | 7 s / 11 s | 1 | [Where it started](https://trendtemplate.com/vlogmas-intro-ai/trend) · [How to](https://trendtemplate.com/vlogmas-intro-ai/how-to) |
 | [Frozen Viking Warrior](https://trendtemplate.com/frozen-viking-warrior-ai) (AI Frozen Viking Warrior effect, Viking filter, AI Nordic Ice Warrior effect) | 8 s | 1 | [Where it started](https://trendtemplate.com/frozen-viking-warrior-ai/trend) · [How to](https://trendtemplate.com/frozen-viking-warrior-ai/how-to) |
 | [Boom Clap Confetti Vibe](https://trendtemplate.com/boom-clap-confetti-ai) (glam AI version from the CapCut template, Charli XCX Boom Clap AI trend) | 6 s / 13 s | 1 | [Song](https://trendtemplate.com/boom-clap-confetti-ai/song) · [Where it started](https://trendtemplate.com/boom-clap-confetti-ai/trend) · [How to](https://trendtemplate.com/boom-clap-confetti-ai/how-to) |
 | [Boom Clap Trend (confetti cannon)](https://trendtemplate.com/boom-clap-confetti-cannon-ai) (Boom Clap trend, Boom Clap challenge, confetti cannon trend) | 6 s / 12 s | 1 | [Song](https://trendtemplate.com/boom-clap-confetti-ai/song) · [Where it started](https://trendtemplate.com/boom-clap-confetti-ai/trend) · [How to](https://trendtemplate.com/boom-clap-confetti-cannon-ai/how-to) |
